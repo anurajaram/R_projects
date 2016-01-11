@@ -10,7 +10,9 @@
 #   (2) w2_salary_data.csv. This dataset comes from company called 
 #     Dognition, and holds info about its canine members. The data was 
 #     compiled and provided by Duke Univ as part of the Tableau course on
-#     the Coursera platform. dataset can be found at location 
+#     the Coursera platform. dataset can be found at location .
+#     This .csv file is available in the parent repository. Please read
+#     the readme file for details.
 #     
 #
 # Note: anything commented as 'Data Exploration' is purely for 
