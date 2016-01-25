@@ -29,3 +29,7 @@ Description - R code for chi-square test of independence, Fisher test, Cochranâ€
 
 7. Program - correlation.R <br />
 Description - working program in R for Kendall correlation, Pearson correlation, Spearman correlation. Visualization using corrgram function.
+
+8. Program - regression_basic.R <br />
+Description - Linear and multiple Regression. Visualization using scatterplotMatrix(), qqPlot() and hat.plot()
+
