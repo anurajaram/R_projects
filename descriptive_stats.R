@@ -3,27 +3,27 @@
 #   Program - Basic Descriptive and Inferential statistics for 
 #             data exploration. 
 #             a. Measures of location & scale for quantitative variables.
-#             b. Frequency & contingency tables (chi-square tests) for 
-#                 categorical variables. 
-#             c. correlation coefficients for continuous, ordinal variables. 
+#             b. Frequency & contingency tables 
+#             c. chi-square tests and similar tests for categorical variables. 
+#             d. correlation coefficients 
 # ---------------------------------------------------------------------------- #
 
 # prepping the environment - clean up memory, set number formatting
-rm(list=ls(all=TRUE))
-options(digits=2)
+ rm(list=ls(all=TRUE))
+ options(digits=2)
 
-data = read.delim(file = 'nesarc.csv', header = TRUE, sep = ',', dec = '.')
+ data = read.delim(file = 'nesarc.csv', header = TRUE, sep = ',', dec = '.')
 
 # =========================================================================== #
 #   Functions for descriptive statistics
 # =========================================================================== #
-vars <- c("WEIGHT", "AGE", "SEX")
-summary(data[vars])
+ vars <- c("WEIGHT", "AGE", "SEX")
+ summary(data[vars])
 
 # function = sapply(), with mean, sd, var, min, max, median, length, range, 
 # and quantile. Also fivenum(), which returns Tukey’s five-number summary 
 # (minimum, lower-hinge, median, upper-hinge and maximum).
-sapply(data[, 1:30],function(x) sum(is.na(x)))  # counts the number of NAs or empty 
+ sapply(data[, 1:30],function(x) sum(is.na(x)))  # counts the number of NAs or empty 
                                             # records for each specified column.
 
 # create custom function
@@ -38,7 +38,7 @@ mystats <- function(x, na.omit=FALSE){
   return(c(n=n, mean=m, stdev=s, skew=skew, kurtosis=kurt))
 }
 
-sapply(data[,1:10], mystats) # apply custom function to first 10 columns ONLY
+ sapply(data[,1:10], mystats) # apply custom function to first 10 columns ONLY
 
 
 # custom function 2
@@ -55,13 +55,13 @@ stat_fun <- function(x){
            range = ran1, quantile = q1, fivenum= f1 ))
 }
 
-sapply(data[vars], stat_fun)  # apply custom funtion to 3 specific columns
+ sapply(data[vars], stat_fun)  # apply custom funtion to 3 specific columns
 
 # there are other complex functions for descriptive statistics under the packages:
 # Hmisc, pastecs, and psych. "pastecs" package has a nice function called stat.desc()
 
 # aggregate fucntion can be used to explore data based on moderator variables
-aggregate(data[vars], by=list(race=data$ETHRACE2A), mean)  
+ aggregate(data[vars], by=list(race=data$ETHRACE2A), mean)  
     # ETHR.. is used here as moderator variable
 
 # freqency tables 
@@ -87,4 +87,67 @@ aggregate(data[vars], by=list(race=data$ETHRACE2A), mean)
  # or CROSSTABS in SPSS.
    CrossTable(data$ETHRACE2A, data$SEX)
    
+
+# =========================================================================== #
+#   Test of independence - for categorical variables  
+#   a. chi-square,    b. Fisher exact test    c. Cochran-Mantel–Haenszel test   
+# =========================================================================== #
+
+# chi-square - use library "vcd"
+  mt1 <- xtabs(~ETHRACE2A + SEX, data=data)
+  chisq.test(mt1)
    
+  mt2 <- xtabs(~SEX + ADULTCH, data=data)
+  chisq.test(mt2)   # test is invalid if any of the combinations has less than 5 occurrences
+  
+# Fisher test 
+# advantage - can be applied to any two-way table with >2 rows&columns, 
+# not just a 2x2 table
+  mt3 <- xtabs(~ADULTCH + SEX, data=data)
+  fisher.test(mt3)
+  
+  # NOTE: if you get a message = "alternative hypothesis: true odds ratio is not equal to 1"
+  # then try using exact2x2() from the exact2x2 package, with options tsmethod="central" or 
+  # tsmethod="blaker". these are functions for Central Fisher✬s Exact Test & Blaker’s exact
+  # test, respectively.
+  exact2x2(mt2, tsmethod="blaker" )
+  
+  
+# Cochran–Mantel–Haenszel chi-square test - checks whether two nominal variables are 
+# conditionally independent in each stratum of a third (moderator) variable
+  mytable <- xtabs(~ETHRACE2A+REGION+SEX, data = data)
+  mantelhaen.test(mytable)  # if p-val < 0.05 then accept NULL hypothesis.
+  
+  
+# =========================================================================== #
+#   Functions for association and visualization
+#   Used if the NULL hypothesis is rejected.
+# =========================================================================== # 
+  assocstats(mt1)
+  kappa(mt1)  # calculate Cohen’s kappa vlaue
+  
+ # visualizaton functions - use mosaic, scatterplots or association plots
+  
+  
+# =========================================================================== #
+#   Functions for correlation - Pearson, Spearman, Kendall, partial, 
+#   polychoric, and polyserial 
+# =========================================================================== #
+  
+# a. Pearson correlation  - assesses degree of linear relationship between two 
+# quantitative variables. default method with cor().
+  
+# Spearman’s Rank Order correlation - assesses 
+# degree of relationship between two rank-ordered variables. 
+  
+# Kendall’s Tau - nonparametric measure of rank correlation.
+  cor(data$AGE, data$DOBY, method = "kendall" )
+  
+  kruskal.test(ETHRACE2A ~ REGION, data=data)  # another association test
+  
+# for comparsion of multiple groups within categorical variables, use functions 
+# ga0_cs() or mctp() from the package  "nparcomp". package "npmc" is no longer
+# available for newer versions of RStudio.
+  gao_cs(REGION ~ ETHRACE2A, data = data)
+  mctp(REGION ~ ETHRACE2A, data = data) 
+  
