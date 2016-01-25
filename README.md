@@ -23,3 +23,9 @@ Description - create a scatterplot and divide into logical segments with naming.
 
 5. Program - anova.R <br />
 Description - anova calculations and visualization
+
+6. Program - chi-sq.R <br />
+Description - R code for chi-square test of independence, Fisher test, Cochran–Mantel–Haenszel chi-square test. Visualization using mosaic function.
+
+7. Program - correlation.R <br />
+Description - working program in R for Kendall correlation, Pearson correlation, Spearman correlation. Visualization using corrgram function.
